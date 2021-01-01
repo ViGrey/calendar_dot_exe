@@ -18,10 +18,11 @@ This NES ROM will run on essentially any NES emulator that can run Ice Climber o
 - \*BSD
 - Linux
 - macOS
+- Windows
 
 ### NES ROM Build Dependencies:
 - **asm6** (You'll probably have to build asm6 from source.  **Make sure the asm6 binary is named `asm` and that the binary is executable and accessible in your PATH**. The source code can be found at http://3dscapture.com/NES/asm6.zip)
-- **gmake** (make)
+- **gmake** (make) (if building on \*BSD, Linux, or macOS)
 
 ### Build NES ROM on \*BSD, Linux, or macOS:
 From a terminal, go to the the main directory of this project (the directory this README.md file exists in).  You can then build the NES ROM with the following command.
