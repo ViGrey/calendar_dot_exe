@@ -178,3 +178,105 @@ TmpDec12NotCarry:
   sbc #$01
   sta tmp
   rts
+
+YearToBinary:
+  lda #$00
+  sta yearBinary
+  sta (yearBinary + 1)
+  sta (yearBinary + 2)
+  sta tmp
+YearToBinaryDigitShiftLoop:
+  ldx tmp
+  lda year, X
+  tay
+  txa
+  asl
+  asl
+  tax
+YearToBinaryAddYearDigitLoop:
+  cpy #$00
+  beq YearToBinaryAddYearDigitLoopDone
+    lda BCDToBinaryTables, X
+    clc
+    adc yearBinary
+    sta yearBinary
+    inx
+    lda BCDToBinaryTables, X
+    adc (yearBinary + 1)
+    sta (yearBinary + 1)
+    inx
+    lda BCDToBinaryTables, X
+    adc (yearBinary + 2)
+    sta (yearBinary + 2)
+    dex
+    dex
+    dey
+    jmp YearToBinaryAddYearDigitLoop
+YearToBinaryAddYearDigitLoopDone:
+  inc tmp
+  lda tmp
+  cmp #$05
+  bcc YearToBinaryDigitShiftLoop
+    lda (year + 5)
+    clc
+    adc yearBinary
+    sta yearBinary
+    lda #$00
+    adc (yearBinary + 1)
+    sta (yearBinary + 1)
+    lda #$00
+    adc (yearBinary + 2)
+    sta (yearBinary + 2)
+    rts
+
+Tmp23Mod7ishLittleEndianToTmp:
+  ldy #$05
+  lda #$00
+  sta tmp
+Tmp23Mod7ishLittleEndianToTmpLoop:
+  lda (tmp + 1)
+  and #%00000111
+  clc
+  adc tmp
+  sta tmp
+  dey
+  beq Tmp23Mod7ishLittleEndianToTmpDone
+    lsr (tmp + 2)
+    ror (tmp + 1)
+    lsr (tmp + 2)
+    ror (tmp + 1)
+    lsr (tmp + 2)
+    ror (tmp + 1)
+    jmp Tmp23Mod7ishLittleEndianToTmpLoop
+Tmp23Mod7ishLittleEndianToTmpDone:
+  rts
+  
+YearBinaryDiv128ToTmp23LittleEndian:
+  lda yearBinary
+  and #%10000000
+  asl
+  rol
+  sta (tmp + 1)
+  lda (yearBinary + 1)
+  and #%01111111
+  asl
+  ora (tmp + 1)
+  sta (tmp + 1)
+  lda (yearBinary + 1)
+  and #%10000000
+  asl
+  rol
+  sta (tmp + 2)
+  lda (yearBinary + 2)
+  and #%00001111
+  asl
+  ora (tmp + 2)
+  sta (tmp + 2)
+  rts
+
+BCDToBinaryTables:
+  .byte $A0, $86, $01, $00
+  .byte $10, $27, $00, $00
+  .byte $E8, $03, $00, $00
+  .byte $64, $00, $00, $00
+  .byte $0A, $00, $00, $00

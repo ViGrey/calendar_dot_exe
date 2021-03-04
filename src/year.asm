@@ -467,3 +467,21 @@ DecYearSwitchEraFromBCToAD:
   lda #ERA_AD
   sta era
   rts
+
+DecYearAllow0:
+  ldx #$05
+  dec year, X
+DecYearAllow0Loop:
+  lda year, X
+  bpl DecYearAllow0LoopContinue
+    lda year, X
+    clc
+    adc #$0A
+    sta year, X
+    dex
+    dec year, X
+    inx
+DecYearAllow0LoopContinue:
+  dex
+  bpl DecYearAllow0Loop
+    rts

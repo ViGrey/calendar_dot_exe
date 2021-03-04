@@ -25,71 +25,6 @@
 
 ; Roman calendar with incorrect leap years until Caesar Augustus
 
-;DrawDaysMacrobiusOctober1582:
-  lda dayOffset
-  tay
-  asl
-  asl
-  clc
-  adc #$24
-  sta (ppuAddr + 1)
-  lda #$21
-  adc #$00
-  sta ppuAddr
-  ldx #$00
-DrawDaysMacrobiusOctober1582Loop:
-  cpx #$08
-  bne DrawDaysMacrobiusOctober1582LoopNotJump11Days
-    ldx #$1C 
-DrawDaysMacrobiusOctober1582LoopNotJump11Days:
-  lda NumbersPrint, X
-  sta tmp
-  inx
-  lda NumbersPrint, X
-  sta (tmp + 1)
-  inx
-  txa
-  pha
-
-  jsr DrawDayDigits
-  pla
-  tax
-  lda (ppuAddr + 1)
-  clc
-  adc #$04
-  sta (ppuAddr + 1)
-  lda ppuAddr
-  adc #$00
-  sta ppuAddr
-  stx tmp
-  lsr tmp
-  txa
-  pha
-
-  ldx month
-  lda DaysPerMonthTable, X
-  cmp tmp
-  beq DrawDaysMacrobiusOctober1582Done
-    pla
-    tax
-    iny
-    cpy #$07
-    bne DrawDaysMacrobiusOctober1582Loop
-      ldy #$00
-      lda (ppuAddr + 1)
-      clc
-      adc #$04
-      sta (ppuAddr + 1)
-      lda ppuAddr
-      adc #$00
-      sta ppuAddr
-      jsr IncPPUAddr1Row
-      jsr IncPPUAddr1Row
-      jmp DrawDaysMacrobiusOctober1582Loop
-DrawDaysMacrobiusOctober1582Done:
-  pla
-  rts
-
 CheckMacrobiusOctober1582:
   ldx #$00
   lda calendar
@@ -99,7 +34,7 @@ CheckMacrobiusOctober1582:
     cmp #ERA_AD
     bne CheckMacrobiusOctober1582Done
       lda year
-      eor (year + 1)
+      ora (year + 1)
       bne CheckMacrobiusOctober1582Done
         lda (year + 2)
         cmp #$01
@@ -122,9 +57,9 @@ CheckMacrobiusOctober1582Done:
 
 DetermineIfMacrobiusError:
   lda year
-  eor (year + 1)
-  eor (year + 2)
-  eor (year + 3)
+  ora (year + 1)
+  ora (year + 2)
+  ora (year + 3)
   bne DetermineIfMacrobiusErrorDone
     lda calendar
     cmp #CALENDAR_ROMAN

@@ -107,10 +107,17 @@ ReadGraphics:
 ReadGraphicsLoop:
   lda graphics, X
   beq ReadGraphicsControlByte
-    sta PPU_DATA
-    inx
-    stx graphicsPointer
-    jmp ReadGraphicsLoop
+    cmp #$F8
+    beq ReadGraphicsHandleAA
+      sta PPU_DATA
+      inx
+      stx graphicsPointer
+      jmp ReadGraphicsLoop
+ReadGraphicsHandleAA:
+  lda #$00
+  sta PPU_DATA
+  inx
+  stx graphicsPointer
 ReadGraphicsControlByte:
   inx
   lda graphics, X

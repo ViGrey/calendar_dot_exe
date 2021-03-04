@@ -29,16 +29,3 @@ IsLeapYear:
   jsr YearDiv4Check
   sta leapYear
   rts
-
-IsLeapYearGregorian:
-  lda calendarTmp
-  cmp #CALENDAR_GREGORIAN
-  bne IsLeapYearGregorianDone
-    lda (yearEquivalent + 4)
-    ora (yearEquivalent + 5)
-    bne IsLeapYearGregorianDone
-      ldx #$03
-      jsr YearDiv4Check
-      sta leapYear 
-IsLeapYearGregorianDone:
-  rts

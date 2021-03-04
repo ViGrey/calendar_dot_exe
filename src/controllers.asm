@@ -44,6 +44,7 @@ UpdateController:
   lda screen
   cmp #SCREEN_START
   bne UpdateControllersCalendar
+    jsr CheckKCode
     jsr DrawCursor
     jsr CheckLeftStart
     jsr CheckRightStart
@@ -59,14 +60,57 @@ UpdateControllersCalendar:
   jsr CheckStart
   rts
 
-CheckStartStart:
+CheckKCode:
+  lda #$00
+  sta disallowA
+  lda kcode
+  bmi CheckKCodeDone
+    lda controller
+    beq CheckKCodeDone
+      cmp controllerLastFrame
+      beq CheckKCodeDone
+        ldy kcode
+        lda KCodeOrder, Y
+        cmp controller
+        bne CheckKCodeFailure
+          inc kcode
+          cpy #$09
+          bne CheckKCodeDone
+            lda #$01
+            sta disallowA
+            lda #%10000000
+            sta kcode
+            jsr SetKCodePalette
+            rts
+CheckKCodeFailure:
+  ldx kcode
+  lda #$00
+  sta kcode
   lda controller
-  and #(BUTTON_START + BUTTON_A)
-  beq CheckStartStartDone
-    lda controllerLastFrame
+  cmp #BUTTON_UP
+  bne CheckKCodeDone
+    inc kcode
+    cpx #$02
+    bne CheckKCodeDone
+      inc kcode
+CheckKCodeDone:
+  rts
+
+KCodeOrder:
+  .byte #BUTTON_UP, #BUTTON_UP, #BUTTON_DOWN, #BUTTON_DOWN
+  .byte #BUTTON_LEFT, #BUTTON_RIGHT, #BUTTON_LEFT, #BUTTON_RIGHT
+  .byte #BUTTON_B, #BUTTON_A
+
+CheckStartStart:
+  lda disallowA
+  bne CheckStartStartDone
+    lda controller
     and #(BUTTON_START + BUTTON_A)
-    bne CheckStartStartDone
-      jsr DrawCalendarScreen
+    beq CheckStartStartDone
+      lda controllerLastFrame
+      and #(BUTTON_START + BUTTON_A)
+      bne CheckStartStartDone
+        jsr DrawCalendarScreen
 CheckStartStartDone:
   rts
 
@@ -149,8 +193,15 @@ CheckUpStartNotYear:
 CheckUpStartNotEra:
   dec calendar
   bpl CheckUpStartContinue
-    lda #CALENDAR_ROMAN
+CheckUpStartKCodeCheck:
+  lda kcode
+  bpl CheckUpStartNotKCode
+    lda #CALENDAR_PARKER_C
     sta calendar
+    jmp CheckUpStartContinue 
+CheckUpStartNotKCode:
+  lda #CALENDAR_ROMAN
+  sta calendar
 CheckUpStartContinue:
   jsr DrawStart
 CheckUpStartDone:
@@ -198,9 +249,19 @@ CheckDownStartNotYear:
     jmp CheckDownStartContinue
 CheckDownStartNotEra:
   inc calendar
+CheckDownStartKCodeCheck:
+  lda kcode
+  bpl CheckDownStartNotKCode
+    lda calendar
+    cmp #$06
+    bcc CheckDownStartContinue
+      lda #CALENDAR_GREGORIAN
+      sta calendar
+      jmp CheckDownStartContinue 
+CheckDownStartNotKCode:
   lda calendar
   cmp #$03
-  bne CheckDownStartContinue
+  bcc CheckDownStartContinue
     lda #CALENDAR_GREGORIAN
     sta calendar
 CheckDownStartContinue:

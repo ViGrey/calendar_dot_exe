@@ -27,6 +27,9 @@ CalendarTypes:
   .byte $88, $89, $8A, $8B, $8C, $E1, "  "; Gregorian
   .byte $E1, $8D, $8E, $8F, $E1, $E1, "  "; Julian
   .byte $E1, $9B, $9C, $8C, $E1, $E1, "  "; Roman
+  .byte $C8, $C9, $CA, $CB, $E1, $E1, "  "; Parker A
+  .byte $C8, $C9, $CA, $CC, $E1, $E1, "  "; Parker B
+  .byte $C8, $C9, $CA, $CD, $E1, $E1, "  "; Parker C
 
 DrawCalendarScreen:
   lda #$01
@@ -82,13 +85,20 @@ DrawCalendarTypeLoop:
 
 SetCalendarTypeTmp:
   lda calendar
+  cmp #CALENDAR_PARKER_A
+  beq SetCalendarTypeTmpGregorian
+    cmp #CALENDAR_PARKER_B
+    beq SetCalendarTypeTmpJulian
+      cmp #CALENDAR_PARKER_C
+      beq SetCalendarTypeTmpJulian
+SetCalendarTypeTmpNotParker:
   cmp #CALENDAR_ROMAN
   bne SetCalendarTypeTmpNotRoman
     lda era
     cmp #ERA_BC
     beq SetCalendarTypeTmpJulian
       lda year
-      eor (year + 1)
+      ora (year + 1)
       bne SetCalendarTypeTmpGregorian
         lda (year + 2)
         cmp #$02
@@ -342,6 +352,7 @@ InitializeDayDraw:
   lda #$20
   sta ppuAddr
   lda #$E3
+  ;lda #$C3
   sta (ppuAddr + 1)
   lda #$00
   sta dayDraw
@@ -359,6 +370,7 @@ InitializeDayDrawDone:
 DrawCalendarDaysRow:
   jsr IncPPUAddr1Row
   jsr IncPPUAddr1Row
+  ;jsr IncPPUAddr1Row
   ldy graphicsPointer
   lda #$00
   sta graphics, Y
@@ -576,15 +588,93 @@ DrawCalendarDaysRowBottomDrawDaysDone:
 DrawCalendar:
   lda #$00
   sta needDraw
+
+  jsr CalculateCalendar
+
+  lda #$00
+  sta needDraw
+  jsr DrawCalendarTop
+  lda #$01
+  sta needDraw
+
+  jsr WaitForNewFrame
+  jsr DrawDaysNormal
+  rts
+
+DrawDaysNormal:
+  lda #$01
+  sta updateDisabled
+
+  lda #$00
+  sta needDraw
+  jsr ClearRedLetterDaysAttributes
+  lda #$00
+  jsr DrawRedLetterAttr
+  lda #$01
+  sta needDraw
+  jsr WaitForNewFrame
+
+  lda #$00
+  sta needDraw
+  jsr InitializeDayDraw
+  jsr DrawCalendarDaysRow
+  lda #$01
+  sta needDraw
+  jsr WaitForNewFrame
+
+  lda #$00
+  sta needDraw
+  jsr DrawCalendarDaysRow
+  lda #$01
+  sta needDraw
+  jsr WaitForNewFrame
+
+  lda #$00
+  sta needDraw
+  jsr DrawCalendarDaysRow
+  lda #$01
+  sta needDraw
+  jsr WaitForNewFrame
+
+  lda #$00
+  sta needDraw
+  jsr DrawCalendarDaysRow
+  lda #$01
+  sta needDraw
+  jsr WaitForNewFrame
+
+  lda #$00
+  sta needDraw
+  jsr DrawCalendarDaysRow
+  lda #$01
+  sta needDraw
+  jsr WaitForNewFrame
+
+  lda #$00
+  sta needDraw
+  jsr DrawCalendarDaysRow
+  lda #$01
+  sta needDraw
+  jsr WaitForNewFrame
+
+  lda #$00
+  sta updateDisabled
+  rts
+
+CalculateCalendar:
   jsr YearToYearEquivalent
   jsr SetCalendarTypeTmp
   lda #$00
   sta dayOffset
+  jsr ParkerEraBCYearDec
   jsr IsLeapYear
   jsr IsLeapYearGregorian
   jsr GetGregorianCenturyOffset
   jsr GetJulianCenturyOffset
   jsr DetermineIfMacrobiusError
+  jsr HandleParkerA
+  jsr HandleParkerB_C
+  jsr ParkerEraBCYearInc
   jsr GetMonthOffset
   lda #$00
   tax
@@ -597,65 +687,6 @@ DrawCalendar:
   sta dayOffset
   jsr ModifyMonthsLeapYearOffset
   jsr DayOffsetMod7
-  lda #$00
-  sta needDraw
-  jsr DrawCalendarTop
-  lda #$01
-  sta needDraw
-  jsr WaitForNewFrame
-  jsr DrawDaysNormal
-  rts
-
-DrawDaysNormal:
-  lda #$01
-  sta updateDisabled
-
-  lda #$00
-  sta needDraw
-
-  jsr InitializeDayDraw
-  jsr DrawCalendarDaysRow
-
-  lda #$01
-  sta needDraw
-  jsr WaitForNewFrame
-
-  lda #$00
-  sta needDraw
-  jsr DrawCalendarDaysRow
-  lda #$01
-  sta needDraw
-  jsr WaitForNewFrame
-
-  lda #$00
-  sta needDraw
-  jsr DrawCalendarDaysRow
-  lda #$01
-  sta needDraw
-  jsr WaitForNewFrame
-
-  lda #$00
-  sta needDraw
-  jsr DrawCalendarDaysRow
-  lda #$01
-  sta needDraw
-  jsr WaitForNewFrame
-
-  lda #$00
-  sta needDraw
-  jsr DrawCalendarDaysRow
-  lda #$01
-  sta needDraw
-  jsr WaitForNewFrame
-
-  lda #$00
-  sta needDraw
-  jsr DrawCalendarDaysRow
-  lda #$01
-  sta needDraw
-  jsr WaitForNewFrame
-  lda #$00
-  sta updateDisabled
   rts
 
 CalendarTiles:

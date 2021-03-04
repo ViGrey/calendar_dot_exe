@@ -59,6 +59,7 @@ make clean
 * **LEFT**/**RIGHT** - Move cursor left/right
 * **UP**/**DOWN** - Cycle through values where cursor is
 * **A**/**START** - Show Calendar screen of the selected calendar
+* **KONAMI CODE (UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A)** - Unlock Parker A, Parker B, and Parker C "hidden" calendar systems
 
 ### Calendar Screen Controls:
 
@@ -70,27 +71,34 @@ make clean
 
 
 ------
+
 ## **CALENDAR SYSTEMS**
 
 Each calendar system in this project assumes a 7 day week and extend backwards in time to well before these calendar systems existed.  It is known that the Romans used an 8 day week, but that is not in the scope of this project.
 
+The Parker A, Parker B, and Parker C calendar systems are the calendar systems described by Matt Parker (Stand-up Maths) in the following YouTube video and are "hidden" behind the Konami Code (Up Up Down Down Left Right Left Right B A) on the title screen: https://www.youtube.com/watch?v=qkt_wmRKYNQ
+
 ### Julian Calendar Rules:
 
 * If the era is AD
-  * Years that are multiples of 4 are leap years (e.g. 8 AD, 1900 AD, 2020 AD)
+  * Years that are multiples of 4 are leap years (e.g. AD 8, AD 1900, AD 2020)
+  * All other years are not leap years
 * If the era is BC
-  * Years that are 1 more than a multiple of 4 are leap years (e.g. BC 9, BC 21, BC 33)
+  * Years that are 1 more than a multiple of 4 are leap years (e.g. 9 BC, 21 BC, 33 BC)
+  * All other years are not leap years
 
 ### Gregorian Calendar Rules:
 
 * If the era is AD
-  * Years that are multiples of 100 are not leap years (e.g. 100 AD, 600 AD, 2200 AD)
-    * **UNLESS** the year is a multiple of 400 (e.g. 400 AD, 1600 AD, 2000 AD)
-  * All other years that are multiples of 4 are leap years (e.g. 8 AD, 1584 AD, 2020 AD)
+  * Years that are multiples of 4 are leap years (e.g. AD 8, AD 1584, AD 2020)
+    * **UNLESS** the year is a multiple of 100 (e.g. AD 100, AD 600, AD 2200)
+      * **UNLESS** the year is a multiple of 400 (e.g. AD 400, AD 1600, AD 2000)
+  * All other years are not leap years
 * If the era is BC
-  * Years that are 1 more than a multiple of 100 are not leap years (e.g. BC 101, BC 601, BC 2201)
-    * **UNLESS** the year is 1 more than a multiple of 400 (e.g. BC 1, BC 401, BC 2001)
-  * All other years that are 1 more than a multiple of 4 are leap years (e.g. BC 9, BC 21, BC 33)
+  * Years that are 1 more than a multiple of 4 are leap years (e.g. 9 BC, 21 BC, 33 BC)
+    * **UNLESS** the year is 1 more than a multiple of 100 (e.g. 101 BC, 601 BC, 2201 BC)
+      * **UNLESS** the year is 1 more than a multiple of 400 (e.g. 1 BC, 401 BC, 2001 BC)
+  * All other years are not leap years
 
 ### Roman Calendar Rules:
 
@@ -101,8 +109,47 @@ Each calendar system in this project assumes a 7 day week and extend backwards i
 
 ##### Roman Calendar Quirks: (Scaliger's interpretation of Macrobius's description of errors in the implementation of the Julian Calendar)
 
-* Starting BC 42 until (inclusive) BC 9, leap years occur every 3 years instead of 4 (e.g. BC 42, BC 39, ..., BC 9)
-* To correct the sync issue of calculating leap years incorrectly, there were no leap years from BC 8 to 5 AD
+* Starting 42 BC until (inclusive) 9 BC, leap years occur every 3 years instead of 4 (e.g. 42 BC, 39 BC, ..., 9 BC)
+* To correct the sync issue of calculating leap years incorrectly, there were no leap years from 8 BC to AD 5
+
+### Parker A Calendar Rules:
+
+* If era is AD
+  * Years that are multiples of 4 are leap years (e.g. AD 8, AD 1584, AD 2020)
+    * **UNLESS** the year is a multiple of 100 (e.g. AD 100, AD 600, AD 2200)
+      * **UNLESS** the year is a multiple of 400 (e.g. AD 400, AD 1600, AD 2000)
+        * **UNLESS** the year ends in 2800, 5600, or 8400 (e.g. AD 8400, AD 15600, AD 992800)
+  * All other years are not leap years
+* If era is BC
+  * Years that are 1 more than a multiple of 4 are leap years (e.g. 9 BC, 21 BC, 33 BC)
+    * **UNLESS** the year is 1 more than a multiple of 100 (e.g. 101 BC, 601 BC, 2201 BC)
+      * **UNLESS** the year is 1 more than a multiple of 400 (e.g. 1 BC, 401 BC, 2001 BC)
+        * **UNLESS** the year ends in 1601, 4401, or 7201 (e.g. 7201 BC, 14401 BC, 991601 BC)
+  * All other years are not leap years
+
+### Parker B Calendar Rules:
+
+* If the era is AD
+  * Years that are multiples of 4 are leap years (e.g. AD 8, AD 1900, AD 2020)
+    * **UNLESS** the year is a multiple of 128 (e.g. AD 129, AD 1025, AD 2048)
+  * All other years are not leap years
+* If the era is BC
+  * Years that are 1 more than a multiple of 4 are leap years (e.g. 9 BC, 21 BC, 33 BC)
+    * **UNLESS** the year is 1 more than a multiple of 128 (e.g. 129 BC, 1025 BC, 2049 BC)
+  * All other years are not leap years
+
+### Parker C Calendar Rules:
+
+* If the era is AD
+  * Years that are multiples of 4 are leap years (e.g. AD 8, AD 1900, AD 2020)
+    * **UNLESS** the year is a multiple of 128 (e.g. AD 129, AD 1025, AD 2048)
+      * **UNLESS** the year is a multiple of 625024 (e.g. AD 625024)
+  * All other years are not leap years
+* If the era is BC
+  * Years that are 1 more than a multiple of 4 are leap years (e.g. 9 BC, 21 BC, 33 BC)
+    * **UNLESS** the year is 1 more than a multiple of 128 (e.g. 129 BC, 1025 BC, 2049 BC)
+      * **UNLESS** the year is 1 more than a multiple of 625024 (e.g. 1 BC, 625025 BC)
+  * All other years are not leap years
 
 ------
 ## **LICENSE**

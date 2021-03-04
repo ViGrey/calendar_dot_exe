@@ -32,6 +32,9 @@ StartMenuPressStart:
 StartMenuTitle:
   .byte "CALENDAR[DOT[EXE"
 
+StartMenuVersion:
+  .byte "            v0.0.2"
+
 StartMenuTitleBoxTop:
   .byte $C0, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C3, $00, $00
   .byte $E0, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E1, $E3
@@ -48,6 +51,9 @@ StartMenuCalendar:
   .byte "GREGORIAN       "
   .byte "@JULIAN@@       "
   .byte "@@ROMAN@@       "
+  .byte "PARKER@A@       "
+  .byte "PARKER@B@       "
+  .byte "PARKER@C@       "
 
 StartMenuEra:
   .byte "BC"
@@ -76,9 +82,15 @@ SetStartMenuPalette:
   sta PPU_ADDR
   lda #$00
   sta PPU_ADDR
-  ldy #$30
   ldx #$08
-  lda #$0F
+  lda kcode
+  bmi SetStartMenuPaletteKCodeActivated
+    ldy #$30
+    lda #$0F
+    jmp SetStartMenuPaletteLoop
+SetStartMenuPaletteKCodeActivated:
+  ldy #$0F
+  lda #$30
 SetStartMenuPaletteLoop:
   sta PPU_DATA
   sta PPU_DATA
@@ -86,6 +98,37 @@ SetStartMenuPaletteLoop:
   sty PPU_DATA
   dex
   bne SetStartMenuPaletteLoop
+    rts
+
+SetKCodePalette:
+  ldy graphicsPointer
+  lda #$00
+  sta graphics, Y
+  iny
+  lda #$FE
+  sta graphics, Y
+  iny
+  lda #$3F 
+  sta graphics, Y
+  iny
+  lda #$00
+  sta graphics, Y
+  iny
+  ldx #$08
+SetKCodePaletteLoop:
+  lda #$30
+  sta graphics, Y
+  iny
+  sta graphics, Y
+  iny
+  sta graphics, Y
+  iny
+  lda #$0F
+  sta graphics, Y
+  iny
+  dex
+  bne SetKCodePaletteLoop
+    sty graphicsPointer
     rts
 
 DrawStartScreen:
@@ -127,6 +170,9 @@ DrawStartScreen:
   jsr UpdateDone
   jsr ReadThenResetGraphics
   jsr DrawTitle
+  jsr UpdateDone
+  jsr ReadThenResetGraphics
+  jsr DrawVersion
   jsr UpdateDone
   jsr ReadThenResetGraphics
   lda #$00
@@ -389,6 +435,31 @@ DrawCursor:
   sta $203
   sta $207
   rts
+
+DrawVersion:
+  ldy graphicsPointer
+  lda #$00
+  tax
+  sta graphics, Y
+  iny
+  lda #$FE
+  sta graphics, Y
+  iny
+  lda #$21
+  sta graphics, Y
+  iny
+  lda #$47
+  sta graphics, Y
+  iny
+DrawVersionLoop:
+  lda StartMenuVersion, X
+  sta graphics, Y
+  iny
+  inx
+  cpx #18
+  bne DrawVersionLoop
+    sty graphicsPointer
+    rts
 
 DrawCopyright:
   ldy graphicsPointer

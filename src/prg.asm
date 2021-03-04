@@ -133,5 +133,8 @@ Update:
 .include "gregorian.asm"
 .include "julian.asm"
 .include "macrobius.asm"
+.include "parker.asm"
+.include "parkera.asm"
 .include "days.asm"
 .include "controllers.asm"
+.include "redletter.asm"
