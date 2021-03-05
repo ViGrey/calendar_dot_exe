@@ -607,7 +607,7 @@ DrawDaysNormal:
 
   lda #$00
   sta needDraw
-  jsr ClearRedLetterDaysAttributes
+  jsr HandleParkerRedLetterDays
   lda #$00
   jsr DrawRedLetterAttr
   lda #$01

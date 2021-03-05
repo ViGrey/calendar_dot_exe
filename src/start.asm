@@ -33,7 +33,7 @@ StartMenuTitle:
   .byte "CALENDAR[DOT[EXE"
 
 StartMenuVersion:
-  .byte "            v0.0.2"
+  .byte "            v0.0.3"
 
 StartMenuTitleBoxTop:
   .byte $C0, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C1, $C3, $00, $00
